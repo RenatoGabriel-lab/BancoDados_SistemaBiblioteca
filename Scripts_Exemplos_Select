@@ -1,0 +1,64 @@
+Exemplos com Select, Where, Order e Join
+
+-- Empréstimos ATIVOS hoje (não devolvidos) – ordenado por data prevista
+SELECT 
+    e.id_emprestimo,
+    u.nome AS usuario,
+    o.titulo,
+    ex.codigo_barras,
+    f.nome AS funcionario,
+    e.data_emprestimo,
+    e.data_prevista
+FROM emprestimos e
+JOIN usuarios u      ON e.id_usuario = u.id_usuario
+JOIN exemplares ex   ON e.id_exemplar = ex.id_exemplar
+JOIN obras o         ON ex.id_obra = o.id_obra
+JOIN funcionarios f  ON e.id_funcionario = f.id_funcionario
+WHERE e.data_devolucao IS NULL
+ORDER BY e.data_prevista ASC;
+
+
+-- Usuários com MULTAS PENDENTES + valor total devido
+SELECT 
+    u.id_usuario,
+    u.nome,
+    u.cpf,
+    COUNT(m.id_multa) AS qtd_multas,
+    SUM(m.valor) AS total_devido
+FROM usuarios u
+JOIN emprestimos e ON u.id_usuario = e.id_usuario
+JOIN multas m      ON e.id_emprestimo = m.id_emprestimo
+WHERE m.status = 'pendente'
+GROUP BY u.id_usuario,u.nome, u.cpf
+ORDER BY total_devido DESC;
+
+
+-- Ranking das 10 obras mais emprestadas (histórico completo)
+SELECT 
+    o.id_obra,
+    o.titulo,
+    COUNT(e.id_emprestimo) AS total_emprestimos
+FROM obras o
+JOIN exemplares ex ON o.id_obra = ex.id_obra
+JOIN emprestimos e ON ex.id_exemplar = e.id_exemplar
+GROUP BY o.id_obra, o.titulo
+ORDER BY total_emprestimos DESC
+LIMIT 10;
+
+
+-- Exemplares ATRASADOS hoje (prevista < hoje e não devolvido)
+SELECT 
+    e.id_emprestimo,
+    u.nome AS usuario,
+    o.titulo,
+    ex.codigo_barras,
+    e.data_prevista,
+    DATEDIFF(CURDATE(), e.data_prevista) AS dias_atraso,
+    (DATEDIFF(CURDATE(), e.data_prevista) * 1.00) AS valor_multa_estimado  -- R$ 1,00 por dia
+FROM emprestimos e
+JOIN usuarios u    ON e.id_usuario = u.id_usuario
+JOIN exemplares ex ON e.id_exemplar = ex.id_exemplar
+JOIN obras o       ON ex.id_obra = o.id_obra
+WHERE e.data_devolucao IS NULL
+  AND e.data_prevista < CURDATE()
+ORDER BY dias_atraso DESC;
