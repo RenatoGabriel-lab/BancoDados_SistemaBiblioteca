@@ -71,6 +71,16 @@ CREATE TABLE obras (
     INDEX idx_isbn (isbn)
 ) ENGINE=InnoDB COMMENT='Registro catalográfico (livro, DVD, tese etc.)';
 
+--
+-- -----------------------------------------------------
+-- Alteração tabela Obras
+-- Campo edicao estava pequeno.
+-- -----------------------------------------------------
+ALTER TABLE `biblioteca_fisica`.`obras` 
+CHANGE COLUMN `edicao` `edicao` VARCHAR(50) NULL DEFAULT NULL ;
+-- -----------------------------------------------------
+
+
 -- -----------------------------------------------------
 -- 5. AUTORES
 -- -----------------------------------------------------
