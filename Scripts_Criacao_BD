@@ -1,0 +1,177 @@
+-- =====================================================
+-- SISTEMA DE GESTÃO DE BIBLIOTECA FÍSICA
+-- Banco de dados: MySQL 8.0+ 
+-- Script completo de criação 
+-- =====================================================
+
+CREATE DATABASE IF NOT EXISTS biblioteca_fisica 
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE biblioteca_fisica;
+
+-- -----------------------------------------------------
+-- 1. FUNCIONARIOS (bibliotecários e administradores)
+-- -----------------------------------------------------
+CREATE TABLE funcionarios (
+    id_funcionario   INT AUTO_INCREMENT PRIMARY KEY,
+    nome             VARCHAR(100) NOT NULL,
+    login            VARCHAR(50)  NOT NULL UNIQUE,
+    senha            VARCHAR(255) NOT NULL, -- armazenar hash 
+    nivel_permissao  ENUM('admin','bibliotecario') DEFAULT 'bibliotecario',
+    status           ENUM('ativo','inativo')        DEFAULT 'ativo',
+    criado_em        DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB COMMENT='Usuários internos do sistema';
+
+-- -----------------------------------------------------
+-- 2. USUARIOS (leitores)
+-- -----------------------------------------------------
+CREATE TABLE usuarios (
+    id_usuario     INT AUTO_INCREMENT PRIMARY KEY,
+    cpf            CHAR(11) NOT NULL UNIQUE,
+    nome           VARCHAR(100) NOT NULL,
+    email          VARCHAR(100),
+    telefone       VARCHAR(20),
+    tipo_usuario   ENUM('aluno','professor','servidor','comunitario') NOT NULL,
+    status         ENUM('ativo','bloqueado','inativo') DEFAULT 'ativo',
+    data_cadastro  DATE NOT NULL DEFAULT (CURRENT_DATE),
+    INDEX idx_cpf (cpf),
+    INDEX idx_nome (nome)
+) ENGINE=InnoDB COMMENT='Leitores da biblioteca';
+
+-- -----------------------------------------------------
+-- 3. REGRAS_EMPRESTIMO (por tipo de usuário) - RECOMENDADA
+-- -----------------------------------------------------
+CREATE TABLE regras_emprestimo (
+    tipo_usuario   ENUM('aluno','professor','servidor','comunitario') PRIMARY KEY,
+    qtd_maxima     TINYINT UNSIGNED NOT NULL DEFAULT 3,
+    prazo_dias     TINYINT UNSIGNED NOT NULL DEFAULT 7,
+    valor_multa_dia DECIMAL(6,2) NOT NULL DEFAULT 1.00,
+    tolerancia_dias TINYINT UNSIGNED NOT NULL DEFAULT 0
+) ENGINE=InnoDB COMMENT='Regras de empréstimo por categoria de usuário';
+
+-- Dados padrão (pode ser alterado depois)
+INSERT INTO regras_emprestimo (tipo_usuario, qtd_maxima, prazo_dias, valor_multa_dia) VALUES
+('aluno',       4,  7, 1.00),
+('professor',   10, 30, 0.50),
+('servidor',    6,  15, 0.80),
+('comunitario', 2,   7, 2.00);
+
+-- -----------------------------------------------------
+-- 4. OBRAS (títulos bibliográficos)
+-- -----------------------------------------------------
+CREATE TABLE obras (
+    id_obra      INT AUTO_INCREMENT PRIMARY KEY,
+    titulo       VARCHAR(200) NOT NULL,
+    subtitulo    VARCHAR(200),
+    isbn         VARCHAR(13) UNIQUE,
+    ano          YEAR,
+    edicao       VARCHAR(20),
+    idioma       VARCHAR(30) DEFAULT 'Português',
+    data_aquisicao DATE,
+    INDEX idx_titulo (titulo),
+    INDEX idx_isbn (isbn)
+) ENGINE=InnoDB COMMENT='Registro catalográfico (livro, DVD, tese etc.)';
+
+-- -----------------------------------------------------
+-- 5. AUTORES
+-- -----------------------------------------------------
+CREATE TABLE autores (
+    id_autor    INT AUTO_INCREMENT PRIMARY KEY,
+    nome_autor  VARCHAR(150) NOT NULL,
+    INDEX idx_nome_autor (nome_autor)
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------
+-- 6. CATEGORIAS (CDD ou outro sistema)
+-- -----------------------------------------------------
+CREATE TABLE categorias (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    codigo_cdd   VARCHAR(20) UNIQUE NOT NULL,
+    descricao    VARCHAR(150) NOT NULL
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------
+-- 7. EXEMPLARES (itens físicos)
+-- -----------------------------------------------------
+CREATE TABLE exemplares (
+    id_exemplar     INT AUTO_INCREMENT PRIMARY KEY,
+    id_obra         INT NOT NULL,
+    codigo_barras   VARCHAR(50) NOT NULL UNIQUE,
+    status          ENUM('disponivel','emprestado','reservado','manutencao') DEFAULT 'disponivel',
+    localizacao     VARCHAR(100),
+    data_aquisicao  DATE,
+    FOREIGN KEY (id_obra) REFERENCES obras(id_obra) ON DELETE RESTRICT,
+    INDEX idx_codigo_barras (codigo_barras),
+    INDEX idx_status (status)
+) ENGINE=InnoDB COMMENT='Item físico com código de barras';
+
+-- -----------------------------------------------------
+-- 8. EMPRESTIMOS
+-- -----------------------------------------------------
+CREATE TABLE emprestimos (
+    id_emprestimo     INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario        INT NOT NULL,
+    id_exemplar       INT NOT NULL,
+    id_funcionario    INT NOT NULL,
+    data_emprestimo   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    data_prevista     DATE NOT NULL,
+    data_devolucao    DATETIME NULL,
+    status            ENUM('ativo','devolvido','atrasado') DEFAULT 'ativo',
+    FOREIGN KEY (id_usuario)     REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_exemplar)    REFERENCES exemplares(id_exemplar),
+    FOREIGN KEY (id_funcionario) REFERENCES funcionarios(id_funcionario),
+    INDEX idx_data_emprestimo (data_emprestimo),
+    INDEX idx_usuario (id_usuario)
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------
+-- 9. RESERVAS
+-- -----------------------------------------------------
+CREATE TABLE reservas (
+    id_reserva       INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario       INT NOT NULL,
+    id_obra          INT NOT NULL,
+    data_reserva     DATETIME DEFAULT CURRENT_TIMESTAMP,
+    data_limite_retirada DATE NULL,
+    status           ENUM('ativa','atendida','cancelada','expirada') DEFAULT 'ativa',
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_obra)    REFERENCES obras(id_obra),
+    INDEX idx_obra_status (id_obra, status),
+    INDEX idx_data_reserva (data_reserva)
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------
+-- 10. MULTAS
+-- -----------------------------------------------------
+CREATE TABLE multas (
+    id_multa         INT AUTO_INCREMENT PRIMARY KEY,
+    id_emprestimo    INT NOT NULL UNIQUE,
+    valor            DECIMAL(8,2) NOT NULL,
+    data_geracao     DATE NOT NULL,
+    data_pagamento   DATE NULL,
+    status           ENUM('pendente','paga','perdoada') DEFAULT 'pendente',
+    FOREIGN KEY (id_emprestimo) REFERENCES emprestimos(id_emprestimo) ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------
+-- 11. Tabelas de junção N:N
+-- -----------------------------------------------------
+CREATE TABLE obras_autores (
+    id_obra  INT NOT NULL,
+    id_autor INT NOT NULL,
+    PRIMARY KEY (id_obra, id_autor),
+    FOREIGN KEY (id_obra)  REFERENCES obras(id_obra)  ON DELETE CASCADE,
+    FOREIGN KEY (id_autor) REFERENCES autores(id_autor) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE obras_categorias (
+    id_obra      INT NOT NULL,
+    id_categoria INT NOT NULL,
+    PRIMARY KEY (id_obra, id_categoria),
+    FOREIGN KEY (id_obra)      REFERENCES obras(id_obra)      ON DELETE CASCADE,
+    FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- =====================================================
+-- FIM DO SCRIPT
+-- Banco criado com 11 tabelas + regras de empréstimo
+-- =====================================================
