@@ -1,0 +1,53 @@
+-- Tabela Funcionários (7 novos)
+INSERT INTO funcionarios (nome, login, senha, nivel_permissao) VALUES
+('João Lima','joao.lima','$2y$10$examplehash1234567890','bibliotecario'),
+('Beatriz Santos','bia','$2y$10$examplehash1234567890','bibliotecario'),
+('Rafael Oliveira','rafael','$2y$10$examplehash1234567890','bibliotecario'),
+('Fernanda Alves','fernanda','$2y$10$examplehash1234567890','bibliotecario'),
+('Lucas Pereira','lucas.p','$2y$10$examplehash1234567890','bibliotecario'),
+('Patrícia Souza','patricia','$2y$10$examplehash1234567890','bibliotecario'),
+('Eduardo Martins','eduardo','$2y$10$examplehash1234567890','admin');
+
+
+
+
+-- Tabela Usuários – 20 leitores
+INSERT INTO usuarios (cpf, nome, email, telefone, tipo_usuario, status, data_cadastro) VALUES
+('11111111111','Maria Eduarda Silva','maria.eduarda@aluno.ifsp.edu.br','11911111111','aluno','ativo','2024-01-10'),
+('22222222222','Pedro Henrique Santos','pedro.h@aluno.ifsp.edu.br','11922222222','aluno','ativo','2024-02-15'),
+('33333333333','Ana Clara Oliveira','ana.clara@prof.ifsp.edu.br','11933333333','professor','ativo','2022-03-20'),
+('44444444444','Gabriel Ferreira','gabriel@aluno.ifsp.edu.br','11944444444','aluno','ativo','2025-01-05'),
+('55555555555','Julia Costa Lima','julia.costa@aluno.ifsp.edu.br','11955555555','aluno','bloqueado','2024-08-12'),
+('66666666666','Lucas Almeida','lucas.almeida@servidor.ifsp.edu.br','11966666666','servidor','ativo','2023-11-01'),
+('77777777777','Laura Mendes','laura@comunitario.com','11977777777','comunitario','ativo','2025-02-28'),
+('88888888888','Enzo Gabriel Rocha','enzo@aluno.ifsp.edu.br','11988888888','aluno','ativo','2025-03-10'),
+('99999999999','Beatriz Nunes','beatriz@prof.ifsp.edu.br','11999999999','professor','ativo','2021-07-15'),
+('12345678901','Felipe Cardoso','felipe@aluno.ifsp.edu.br','11912345678','aluno','ativo','2024-09-20'),
+('12345678910','Camila Ribeiro','camila@aluno.ifsp.edu.br','11912345679','aluno','ativo','2025-01-20'),
+('12345678911','Thiago Mendes','thiago@aluno.ifsp.edu.br','11912345680','aluno','ativo','2024-11-11'),
+('12345678912','Isabella Duarte','isabella@prof.ifsp.edu.br','11912345681','professor','ativo','2020-05-10'),
+('12345678913','Gustavo Lima','gustavo@servidor.ifsp.edu.br','11912345682','servidor','ativo','2023-06-30'),
+('12345678914','Valentina Torres','valentina@comunitario.com','11912345683','comunitario','ativo','2025-03-01'),
+('12345678915','Matheus Vieira','matheus@aluno.ifsp.edu.br','11912345684','aluno','ativo','2025-02-10'),
+('12345678916','Sophia Almeida','sophia@aluno.ifsp.edu.br','11912345685','aluno','ativo','2024-12-05'),
+('12345678917','Arthur Fernandes','arthur@aluno.ifsp.edu.br','11912345686','aluno','ativo','2025-01-15'),
+('12345678918','Heloísa Castro','heloisa@prof.ifsp.edu.br','11912345687','professor','ativo','2019-08-20'),
+('12345678919','Davi Barbosa','davi@aluno.ifsp.edu.br','11912345688','aluno','ativo','2025-03-20');
+
+-- Tabela Autores (autores reais --- contém valores duplicados, para exemplo de uso comando DELETE com WHERE)
+INSERT INTO autores (nome_autor) VALUES
+('Machado de Assis'),('Clarice Lispector'),('Jorge Amado'),('Graciliano Ramos'),('Carlos Drummond de Andrade'),
+('J.K. Rowling'),('George Orwell'),('Gabriel García Márquez'),('Agatha Christie'),('Stephen King'),
+('Yuval Noah Harari'),('Malcolm Gladwell'),('Tahar Ben Jelloun'),('Chimamanda Ngozi Adichie'),('José Saramago'),
+('Paulo Coelho'),('Augusto Cury'),('Lya Luft'),('Mia Couto'),('Raphael Montes'),
+('Teresa Medeiros'),('Colleen Hoover'),('Taylor Jenkins Reid'),('Eduardo Spohr'),('André Vianco'),
+('Jane Austen'),('Fiódor Dostoiévski'),('Franz Kafka'),('Virginia Woolf'),('Haruki Murakami'),
+('Isabel Allende'),('Mario Vargas Llosa'),('Toni Morrison'),('Salman Rushdie'),('Elena Ferrante'),
+('Herman Melville'),('Mark Twain'),('Charles Dickens'),('Emily Brontë'),('William Shakespeare'),
+('Albert Camus'),('Jean-Paul Sartre'),('Simone de Beauvoir'),('Neil Gaiman'),('Philip K. Dick'),
+('Isaac Asimov'),('Arthur C. Clarke'),('Frank Herbert'),('Ray Bradbury'),('Ursula K. Le Guin');
+
+INSERT INTO categorias (codigo_cdd, descricao) VALUES
+('510','Matemática'),('004','Ciência da computação'),('150','Psicologia'),('370','Educação'),('610','Medicina'),
+('650','Gestão e administração'),('740','Desenho e artes decorativas'),('780','Música'),
+('813','Ficção americana'),('869','Literatura portuguesa');
