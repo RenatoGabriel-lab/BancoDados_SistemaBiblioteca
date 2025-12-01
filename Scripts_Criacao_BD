@@ -63,7 +63,7 @@ CREATE TABLE obras (
     titulo       VARCHAR(200) NOT NULL,
     subtitulo    VARCHAR(200),
     isbn         VARCHAR(13) UNIQUE,
-    ano          YEAR,
+    ano          SMALLINT,
     edicao       VARCHAR(20),
     idioma       VARCHAR(30) DEFAULT 'Português',
     data_aquisicao DATE,
