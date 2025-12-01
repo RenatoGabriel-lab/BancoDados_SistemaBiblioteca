@@ -1,0 +1,104 @@
+-- =====================================================
+-- DADOS DE TESTE – Biblioteca Física
+-- Executar apenas após rodar o script de criação do banco
+-- =====================================================
+
+USE biblioteca_fisica;
+
+-- 1. Funcionários (bibliotecários)
+INSERT INTO funcionarios (nome, login, senha, nivel_permissao) VALUES
+('Ana Silva',        'ana',        '$2y$10$z1x2c3v4b5n6m7k8l9p0o1u2y3t4r5e6w7q8e9r0t1y2u3i4o5p6.', 'admin'), -- senha: 123456
+('Carlos Mendes',    'carlos',     '$2y$10$z1x2c3v4b5n6m7k8l9p0o1u2y3t4r5e6w7q8e9r0t1y2u3i4o5p6.', 'bibliotecario'),
+('Mariana Costa',    'mariana',    '$2y$10$z1x2c3v4b5n6m7k8l9p0o1u2y3t4r5e6w7q8e9r0t1y2u3i4o5p6.', 'bibliotecario');
+
+-- 2. Usuários (leitores) – 10 registros reais
+INSERT INTO usuarios (cpf, nome, email, telefone, tipo_usuario, status, data_cadastro) VALUES
+('11122233344','João Pedro Alves','joao@email.com','11987654321','aluno','ativo','2024-01-15'),
+('22233344455','Maria Clara Souza','maria@email.com','11976543210','professor','ativo','2023-08-20'),
+('33344455566','Lucas Oliveira','lucas@email.com','11965432109','aluno','ativo','2025-03-10'),
+('44455566677','Ana Beatriz Lima','ana.beatriz@email.com','11954321098','aluno','ativo','2025-02-28'),
+('55566677788','Gabriel Santos','gabriel@email.com','11943210987','servidor','ativo','2024-06-01'),
+('66677788899','Juliana Ferreira','ju@email.com','11932109876','comunitario','ativo','2025-01-05'),
+('77788899900','Pedro Henrique','pedro@email.com','11921098765','aluno','ativo','2024-11-20'),
+('88899900011','Laura Martins','laura@email.com','11910987654','aluno','ativo','2025-04-01'),
+('99900011122','Enzo Gabriel','enzo@email.com','11909876543','aluno','bloqueado','2024-09-12'),
+('12345678900','Carla Menezes','carla@email.com','11998765432','professor','ativo','2023-12-10');
+
+-- 3. Autores (20 autores reais e fictícios)
+INSERT INTO autores (nome_autor) VALUES
+('Machado de Assis'),('Clarice Lispector'),('Jorge Amado'),('Graciliano Ramos'),('Carlos Drummond de Andrade'),
+('J.K. Rowling'),('George Orwell'),('Gabriel García Márquez'),('Agatha Christie'),('Stephen King'),
+('Yuval Noah Harari'),('Eduardo Spohr'),('Raphael Montes'),('Teresa Medeiros'),('Lya Luft'),
+('Paulo Coelho'),('Augusto Cury'),('José Saramago'),('Mia Couto'),('Chimamanda Ngozi Adichie');
+
+-- 4. Categorias (CDD básico)
+INSERT INTO categorias (codigo_cdd, descricao) VALUES
+('000','Obras gerais'),('100','Filosofia'),('200','Religião'),('300','Ciências sociais'),
+('400','Linguagem'),('500','Ciências puras'),('600','Tecnologia'),('700','Artes'),
+('800','Literatura'),('900','História e geografia');
+
+-- 5. Obras (10 títulos variados)
+INSERT INTO obras (titulo, subtitulo, isbn, ano, edicao, idioma) VALUES
+('Dom Casmurro',NULL,'9786550970000',1899,'1ª','Português'),
+('A Hora da Estrela',NULL,'9788532529977',1977,'1ª','Português'),
+('Harry Potter e a Pedra Filosofal','Livro 1',NULL,1997,'1ª','Português'),
+('1984',NULL,'9788535914848',1949,'1ª','Português'),
+('O Pequeno Príncipe',NULL,'9786550970532',1943,'1ª','Português'),
+('Sapiens: Uma breve história da humanidade',NULL,'9788535925728',2015,'1ª','Português'),
+('A Menina que Roubava Livros',NULL,'9788580577088',2005,'1ª','Português'),
+('Clean Code','A Handbook of Agile Software Craftsmanship','9780136083238',2008,'1ª','Inglês'),
+('O Alquimista',NULL,'9786555110746',1988,'1ª','Português'),
+('Memórias Póstumas de Brás Cubas',NULL,'9786550970017',1881,'1ª','Português');
+
+-- 6. Exemplares (8 itens físicos)
+INSERT INTO exemplares (id_obra, codigo_barras, status, localizacao, data_aquisicao) VALUES
+(1,'0000000001','disponivel','Estante A1','2023-01-10'),
+(1,'0000000002','emprestado','Estante A1','2023-01-10'),
+(2,'0000000003','disponivel','Estante B2','2024-02-15'),
+(3,'0000000004','disponivel','Estante C3','2023-06-20'),
+(3,'0000000005','reservado','Estante C3','2023-06-20'),
+(4,'0000000006','disponivel','Estante D4','2024-09-01'),
+(5,'0000000007','disponivel','Estante E5','2022-11-11'),
+(6,'0000000008','emprestado','Estante F6','2025-01-05'),
+(7,'0000000009','disponivel','Estante G7','2024-08-08'),
+(8,'0000000010','manutencao','Estante H8','2023-12-12');
+
+-- 7. Relacionamentos N:N (exemplos)
+INSERT INTO obras_autores (id_obra, id_autor) VALUES
+(1,1),(2,2),(3,6),(4,7),(5,20),(6,11),(7,16),(8,18),(9,16),(10,1);
+
+INSERT INTO obras_categorias (id_obra, id_categoria) VALUES
+(1,9),(2,9),(3,9),(4,9),(5,9),(6,9),(7,9),(8,5),(9,9),(10,9);
+
+-- 8. Empréstimos ativos e históricos 
+INSERT INTO emprestimos (id_usuario, id_exemplar, id_funcionario, data_emprestimo, data_prevista, data_devolucao, status) VALUES
+(1,2,2,'2025-04-01 10:30:00','2025-04-15',NULL,'ativo'),
+(2,8,1,'2025-03-20 14:15:00','2025-04-19',NULL,'ativo'),
+(3,5,3,'2025-03-25 09:00:00','2025-04-01','2025-04-05','devolvido'),
+(4,1,2,'2025-02-10 11:20:00','2025-02-24','2025-03-05','devolvido'),
+(5,6,1,'2025-03-28 16:45:00','2025-04-11',NULL,'ativo');
+
+-- 9. Reservas ativas e atendidas
+INSERT INTO reservas (id_usuario, id_obra, data_reserva, data_limite_retirada, status) VALUES
+(6,3,'2025-04-02 08:30:00','2025-04-04','ativa'),      -- fila do Harry Potter
+(7,3,'2025-04-03 10:15:00','2025-04-05','ativa'),
+(8,1,'2025-04-01 13:20:00','2025-04-03','atendida'),   -- já retirou
+(9,5,'2025-03-30 17:00:00','2025-04-01','expirada');   -- perdeu o prazo
+
+-- 10. Multas (exemplo de atraso)
+INSERT INTO multas (id_emprestimo, valor, data_geracao, data_pagamento, status) VALUES
+(4,15.00,'2025-03-06',NULL,'pendente'),      -- atraso de 9 dias do empréstimo 4
+(3,3.00,'2025-04-06','2025-04-10','paga');
+
+-- =====================================================
+-- FIM DOS DADOS DE TESTE
+-- Criação de:
+-- • 3 funcionários
+-- • 10 usuários
+-- • 20 autores
+-- • 10 obras
+-- • 8 exemplares
+-- • Empréstimos ativos e devolvidos
+-- • Reservas na fila
+-- • Multas pendentes e pagas
+-- =====================================================
