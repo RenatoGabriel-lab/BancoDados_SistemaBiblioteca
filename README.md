@@ -1,6 +1,9 @@
 # BancoDados_SistemaBiblioteca
 Modelagem Banco de Dados - Sistema Biblioteca
 
+- Utilizado MySQL Workbench versão 8.0.44 (64 bits)
+- Banco de dados MySQL versão 8.044 (64 bits)
+
 - Scripts para criação de banco de dados
 - Scripts para inserção de dados de exemplo
 - Scripts de Exemplos de Inserção de dados aleatórios.
