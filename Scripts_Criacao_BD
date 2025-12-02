@@ -71,7 +71,6 @@ CREATE TABLE obras (
     INDEX idx_isbn (isbn)
 ) ENGINE=InnoDB COMMENT='Registro catalográfico (livro, DVD, tese etc.)';
 
---
 -- -----------------------------------------------------
 -- Alteração tabela Obras
 -- Campo edicao estava pequeno.
@@ -89,6 +88,16 @@ CREATE TABLE autores (
     nome_autor  VARCHAR(150) NOT NULL,
     INDEX idx_nome_autor (nome_autor)
 ) ENGINE=InnoDB;
+
+-- -----------------------------------------------------
+-- Alteração tabela Autores
+-- Campo nome_autor permitia duplicatas.
+-- -----------------------------------------------------
+ALTER TABLE `biblioteca_fisica`.`autores` 
+ADD UNIQUE INDEX `nome_autor_UNIQUE` (`nome_autor` ASC) VISIBLE;
+;
+-- -----------------------------------------------------
+
 
 -- -----------------------------------------------------
 -- 6. CATEGORIAS (CDD ou outro sistema)
