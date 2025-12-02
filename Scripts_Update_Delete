@@ -1,0 +1,61 @@
+-- -----------------------------------------------------
+-- 1. UPDATEs (atualizações de exemplo)
+-- -----------------------------------------------------
+
+-- Marcar como devolvido um empréstimo ativo + data atual
+UPDATE emprestimos 
+SET 
+    data_devolucao = CURDATE(),
+    status = 'devolvido'
+WHERE id_emprestimo = 1 
+  AND data_devolucao IS NULL;
+
+-- Atualizar status do exemplar para 'disponivel' após devolução
+UPDATE exemplares 
+SET status = 'disponivel'
+WHERE id_exemplar IN (
+    SELECT id_exemplar FROM emprestimos 
+    WHERE id_emprestimo = 1
+);
+
+-- Pagar uma multa pendente (ex: usuário quitou no balcão)
+UPDATE multas 
+SET 
+    data_pagamento = '2025-04-05',
+    status = 'paga'
+WHERE id_multa = 13 
+  AND status = 'pendente';
+
+
+-- -----------------------------------------------------
+-- 2. DELETEs (exclusões com WHERE obrigatório)
+-- -----------------------------------------------------
+
+-- Remover uma reserva que foi cancelada ou expirou há mais de 30 dias
+DELETE FROM reservas 
+WHERE status IN ('cancelada', 'expirada')
+  AND data_reserva < DATE_SUB(CURDATE(), INTERVAL 30 DAY);
+
+-- Excluir um usuário inativo há mais de 2 anos e sem movimentação
+-- (primeiro verifica se não tem empréstimos/multas pendentes)
+DELETE FROM usuarios 
+WHERE status = 'inativo'
+  AND data_cadastro < DATE_SUB(CURDATE(), INTERVAL 2 YEAR)
+  AND id_usuario NOT IN (
+      SELECT DISTINCT id_usuario FROM emprestimos 
+      WHERE data_devolucao IS NULL OR status = 'atrasado'
+  )
+  AND id_usuario NOT IN (SELECT id_usuario FROM multas WHERE status = 'pendente')
+LIMIT 10;  -- segurança extra
+
+-- Remover exemplar em manutenção há mais de 1 ano (perdido ou sucateado)
+DELETE FROM exemplares 
+WHERE status = 'manutencao'
+  AND data_aquisicao < DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+  AND id_exemplar NOT IN (SELECT id_exemplar FROM emprestimos WHERE data_devolucao IS NULL);
+
+
+
+
+
+
